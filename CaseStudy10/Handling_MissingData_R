@@ -1,0 +1,58 @@
+# Listwise deletion
+newdata <- na.omit(mydata)
+
+# Pairwise deletion
+ncovMatrix <- cov(mydata, use="pairwise.complete.obs")
+
+# Listwise deletion
+ncovMatrix <- cov(mydata, use="complete.obs")
+
+# Dropping variables
+df <- subset(mydata, select = -c(x,z))
+df <- mydata[ -c(1, 3:4) ]
+
+# Time Series Specific Methods
+library(imputeTS)
+
+na.random(mydata)               # Random Imputation
+na.locf(mydata, option="locf")  # Last Obs. Carried Forward
+na.locf(mydata, option="nocb")  # Next Obs. Carried Forward
+na.interpolation(mydata)        # Linear interpolation
+na.seadec(mydata, algorithm="interpolation")  # Seasonal Adjustment then Linear interpolation
+
+# Mean, Median, & Mode
+library(imputeTS)
+
+na.mean(mydata, option="mean")   # Mean Imputation
+na.mean(mydata, option="median") # Median Imputation
+na.mean(mydata, option="mode")   # Mode Imputation
+
+
+
+# Multiple Imputation
+
+# using mice library in R
+library(mice)
+
+# Deterministic regression imputation via mice
+imp <- mice(mydata, method="norm.predict", m=1)
+
+# Store data
+data_imp <- complete(imp)
+
+# Multiple Imputation
+imp <- mice(mydata, m=5)
+
+# Build predictive model
+fit <- with(data=imp, lm(y ~ x + z))
+
+# Combine results of all 5 models
+combine <- pool(fit)
+
+
+
+# Imputation of Categorical Variables
+
+# KNN (K Nearest Neighbors)
+library(DMwR)
+knnOutput <- knnImputation(mydata)
